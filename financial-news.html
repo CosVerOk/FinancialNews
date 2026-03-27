@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanceRoom — Bản tin tài chính</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e8e8f0;--text2:#8888a0;--text3:#444458;--accent:#00e5a0;--accent2:#3d7eff;--accent3:#ff4466;--accent4:#ffaa00;--accent5:#b060ff;--scrollbar:#1e1e2a;--header-h:52px}
+[data-theme="light"]{--bg:#f0f0f5;--bg2:#ffffff;--bg3:#e8e8f0;--border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);--text:#0d0d1a;--text2:#55556a;--text3:#aaaabc;--accent:#007a55;--accent2:#1a5cd4;--accent3:#c41030;--accent4:#8a6000;--accent5:#7030c0;--scrollbar:#d8d8e8}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text)}
+header{height:var(--header-h);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;background:var(--bg2);flex-shrink:0;z-index:200}
+.logo{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:14px;letter-spacing:.06em;color:var(--accent);white-space:nowrap}
+.logo span{color:var(--text3)}
+.hsep{width:1px;height:18px;background:var(--border2)}
+.live-pill{display:flex;align-items:center;gap:5px;background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);border-radius:20px;padding:3px 9px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.live-txt{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em}
+.refresh-info{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)}
+.refresh-info b{color:var(--accent)}
+.hactions{margin-left:auto;display:flex;align-items:center;gap:6px}
+.btn-icon{width:30px;height:30px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;flex-shrink:0}
+.btn-icon:hover{background:var(--bg3);color:var(--text)}
+.alert-bell{position:relative}
+.alert-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--accent3);font-size:9px;font-family:'IBM Plex Mono',monospace;color:#fff;display:none;align-items:center;justify-content:center;font-weight:600;border:2px solid var(--bg2)}
+.alert-badge.show{display:flex}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:192px;flex-shrink:0;border-right:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-inner{flex:1;overflow-y:auto;padding:12px 0}
+.sidebar-inner::-webkit-scrollbar{width:3px}
+.sidebar-inner::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px}
+.slbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--text3);padding:0 13px 7px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 13px;font-size:12.5px;color:var(--text2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;user-select:none}
+.nav-item:hover{color:var(--text);background:var(--bg3)}
+.nav-item.active{color:var(--text);border-left-color:var(--accent);background:rgba(0,229,160,.04)}
+.ni{font-size:13px;width:17px;text-align:center}
+.nc{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;background:var(--bg3);padding:2px 5px;border-radius:10px;color:var(--text3)}
+.nav-item.active .nc{background:rgba(0,229,160,.12);color:var(--accent)}
+.ssep{height:1px;background:var(--border);margin:10px 0}
+.wl-wrap{padding:10px 13px 12px;flex-shrink:0;border-top:1px solid var(--border)}
+.wl-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.wl-ttl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase}
+.wl-btn{font-size:18px;color:var(--accent);cursor:pointer;background:none;border:none;padding:0;line-height:1}
+.wl-btn:hover{opacity:.7}
+.wl-list{display:flex;flex-direction:column;gap:4px;max-height:150px;overflow-y:auto}
+.wl-list::-webkit-scrollbar{width:2px}
+.wl-list::-webkit-scrollbar-thumb{background:var(--scrollbar)}
+.wl-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;background:var(--bg3);cursor:pointer;transition:background .12s;position:relative}
+.wl-item:hover{background:var(--bg)}
+.wl-item.ha{border-left:2px solid var(--accent3)}
+.wl-sym{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--text)}
+.wl-cnt{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent)}
+.wl-chg{font-family:'IBM Plex Mono',monospace;font-size:10px;margin-left:auto}
+.wl-chg.up{color:var(--accent)}
+.wl-chg.dn{color:var(--accent3)}
+.wl-del{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0 2px;opacity:0}
+.wl-item:hover .wl-del{opacity:1}
+.wl-empty{font-size:11px;color:var(--text3);text-align:center;padding:10px 0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.feed-hd{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--bg2)}
+.feed-title{font-size:13px;font-weight:500}
+.feed-cnt{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)}
+.ftabs{display:flex;gap:3px;margin-left:auto}
+.ftab{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;transition:all .12s}
+.ftab:hover{color:var(--text)}
+.ftab.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.feed{flex:1;overflow-y:auto}
+.feed::-webkit-scrollbar{width:4px}
+.feed::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:4px}
+.nitem{border-bottom:1px solid var(--border);padding:12px 16px;cursor:pointer;transition:background .12s;display:flex;gap:11px;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.nitem:hover{background:var(--bg3)}
+.nitem.nm-high{background:rgba(255,68,102,.04);border-left:2px solid var(--accent3)}
+.nitem.nm-wl{background:rgba(0,229,160,.04);border-left:2px solid var(--accent)}
+.nitem.nm-corp{background:rgba(61,126,255,.04);border-left:2px solid var(--accent2)}
+.ibar{width:3px;border-radius:2px;flex-shrink:0;align-self:stretch}
+.ih{background:var(--accent3)}
+.im{background:var(--accent4)}
+.il{background:var(--text3)}
+.nleft{flex:1;min-width:0}
+.nmeta{display:flex;align-items:center;gap:5px;margin-bottom:4px;flex-wrap:wrap}
+.sbadge{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid;font-weight:500}
+.ctag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
+.ctag.macro{background:rgba(61,126,255,.1);color:var(--accent2)}
+.ctag.stock{background:rgba(0,229,160,.1);color:var(--accent)}
+.ctag.crypto{background:rgba(176,96,255,.1);color:var(--accent5)}
+.ctag.forex{background:rgba(255,170,0,.1);color:var(--accent4)}
+.ctag.commodity{background:rgba(255,170,0,.1);color:var(--accent4)}
+.ctag.risk{background:rgba(255,68,102,.1);color:var(--accent3)}
+.ctag.corp{background:rgba(61,126,255,.12);color:var(--accent2)}
+.ntime{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);margin-left:auto;white-space:nowrap}
+.nbadge{font-size:9px;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.nbadge.new{background:var(--accent);color:#000}
+.nbadge.corp{background:var(--accent2);color:#fff}
+.nbadge.wl{background:rgba(0,229,160,.15);color:var(--accent);border:1px solid rgba(0,229,160,.3)}
+.ntitle{font-size:13px;font-weight:500;line-height:1.5;color:var(--text);margin-bottom:3px}
+.nsum{font-size:11.5px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ntags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.stag{font-family:'IBM Plex Mono',monospace;font-size:10px;background:rgba(0,229,160,.08);color:var(--accent);border:1px solid rgba(0,229,160,.2);padding:1px 6px;border-radius:4px;cursor:pointer;transition:background .12s}
+.stag:hover{background:rgba(0,229,160,.18)}
+.ticker-bar{height:32px;border-top:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;overflow:hidden;flex-shrink:0}
+.tlbl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:#000;background:var(--accent);padding:0 10px;height:100%;display:flex;align-items:center;font-weight:600;flex-shrink:0;letter-spacing:.06em}
+.ttrack{flex:1;overflow:hidden}
+.tinner{display:flex;animation:scroll 50s linear infinite;white-space:nowrap}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ti{display:inline-flex;align-items:center;gap:5px;padding:0 16px;font-family:'IBM Plex Mono',monospace;font-size:10.5px}
+.ts{color:var(--text2)}
+.tv{color:var(--text);font-weight:500}
+.tc.up{color:var(--accent)}
+.tc.dn{color:var(--accent3)}
+.rpanel{width:262px;flex-shrink:0;border-left:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;overflow-y:auto}
+.rpanel::-webkit-scrollbar{width:3px}
+.rpanel::-webkit-scrollbar-thumb{background:var(--scrollbar)}
+.psect{padding:13px;border-bottom:1px solid var(--border)}
+.phead{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:10px}
+.mi{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:12px}
+.mn{color:var(--text2)}
+.mv{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:11px}
+.mc{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 5px;border-radius:3px}
+.mc.up{color:var(--accent);background:rgba(0,229,160,.08)}
+.mc.dn{color:var(--accent3);background:rgba(255,68,102,.08)}
+.ah{display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto}
+.ah::-webkit-scrollbar{width:2px}
+.ah::-webkit-scrollbar-thumb{background:var(--scrollbar)}
+.ai-card{padding:8px 10px;border-radius:7px;border:1px solid;cursor:pointer;transition:opacity .12s}
+.ai-card:hover{opacity:.8}
+.ai-card.twl{border-color:rgba(0,229,160,.25);background:rgba(0,229,160,.05)}
+.ai-card.tcorp{border-color:rgba(61,126,255,.25);background:rgba(61,126,255,.05)}
+.ai-card.thigh{border-color:rgba(255,68,102,.25);background:rgba(255,68,102,.05)}
+.ai-sym{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;margin-bottom:3px}
+.ai-sym.twl{color:var(--accent)}
+.ai-sym.tcorp{color:var(--accent2)}
+.ai-sym.thigh{color:var(--accent3)}
+.ai-ttl{font-size:11px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ai-time{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);margin-top:3px}
+.no-al{font-size:11px;color:var(--text3);text-align:center;padding:14px 0}
+.hg{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.hc{padding:7px;border-radius:6px;text-align:center}
+.hc .hs{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;margin-bottom:2px}
+.hc .hv{font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.hsup{background:rgba(0,229,160,.18);color:var(--accent)}
+.hup{background:rgba(0,229,160,.09);color:#00cc88}
+.hneu{background:var(--bg3);color:var(--text3)}
+.hdn{background:rgba(255,68,102,.09);color:#ff6688}
+.hsdn{background:rgba(255,68,102,.18);color:var(--accent3)}
+.aibox{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:8px;padding:11px}
+.ailbl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.ailbl::before{content:'';display:inline-block;width:5px;height:5px;background:var(--accent);border-radius:50%}
+.aitxt{font-size:11.5px;color:var(--text2);line-height:1.75}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:22px;width:360px;max-width:92vw}
+.modal-ttl{font-size:14px;font-weight:600;margin-bottom:15px}
+.minput{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.05em;text-transform:uppercase;outline:none;transition:border-color .15s}
+.minput:focus{border-color:var(--accent)}
+.minput::placeholder{color:var(--text3);text-transform:none;letter-spacing:0;font-family:'Be Vietnam Pro',sans-serif;font-size:12px}
+.mhint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .12s}
+.chip:hover{background:var(--bg3);color:var(--text);border-color:var(--accent)}
+.mbtns{display:flex;gap:8px;margin-top:16px}
+.bpri{flex:1;padding:9px;border-radius:8px;border:none;background:var(--accent);color:#000;font-weight:600;font-size:13px;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;transition:opacity .15s}
+.bpri:hover{opacity:.85}
+.bsec{flex:1;padding:9px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;transition:all .15s}
+.bsec:hover{color:var(--text);background:var(--bg3)}
+.tstack{position:fixed;top:60px;right:14px;display:flex;flex-direction:column;gap:6px;z-index:999;pointer-events:none;width:300px}
+.toast{padding:10px 14px;border-radius:8px;font-size:12px;font-weight:500;border:1px solid;transform:translateX(320px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:auto}
+.toast.show{transform:translateX(0);opacity:1}
+.toast.twl{background:rgba(0,229,160,.12);border-color:rgba(0,229,160,.3);color:var(--accent)}
+.toast.tcorp{background:rgba(61,126,255,.12);border-color:rgba(61,126,255,.3);color:var(--accent2)}
+.toast.thigh{background:rgba(255,68,102,.12);border-color:rgba(255,68,102,.3);color:var(--accent3)}
+.toast.tinfo{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+.toast-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.sk{padding:13px 16px;border-bottom:1px solid var(--border)}
+.bone{background:linear-gradient(90deg,var(--bg3) 25%,var(--border2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:4px}
+@keyframes shim{from{background-position:200% 0}to{background-position:-200% 0}}
+@media(max-width:900px){.rpanel{display:none}}
+@media(max-width:640px){.sidebar{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">FINANCE<span>ROOM</span></div>
+  <div class="hsep"></div>
+  <div class="live-pill"><div class="live-dot"></div><div class="live-txt">LIVE</div></div>
+  <div class="refresh-info">cập nhật sau <b id="cd">60</b>s</div>
+  <div class="hactions">
+    <div class="alert-bell">
+      <button class="btn-icon" onclick="scrollToAlerts()" title="Xem alerts">🔔</button>
+      <div class="alert-badge" id="abadge">0</div>
+    </div>
+    <button class="btn-icon" onclick="openAddModal()" title="Thêm watchlist">⭐</button>
+    <button class="btn-icon" onclick="refreshNow()" title="Làm mới">↻</button>
+    <button class="btn-icon" onclick="toggleTheme()" title="Đổi theme">◑</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-inner">
+      <div class="slbl">Chủ đề</div>
+      <div class="nav-item active" onclick="fCat(this,'all')"><span class="ni">▤</span>Tất cả<span class="nc" id="cnt-all">0</span></div>
+      <div class="nav-item" onclick="fCat(this,'watchlist')"><span class="ni">⭐</span>Watchlist<span class="nc" id="cnt-wl">0</span></div>
+      <div class="nav-item" onclick="fCat(this,'corp')"><span class="ni">🏢</span>Doanh nghiệp<span class="nc" id="cnt-corp">0</span></div>
+      <div class="nav-item" onclick="fCat(this,'macro')"><span class="ni">🌐</span>Vĩ mô<span class="nc" id="cnt-macro">0</span></div>
+      <div class="nav-item" onclick="fCat(this,'stock')"><span class="ni">📈</span>Chứng khoán<span class="nc" id="cnt-stock">0</span></div>
+      <div class="nav-item" onclick="fCat(this,'crypto')"><span class="ni">₿</span>Crypto<span class="nc" id="cnt-crypto">0</span></div>
+      <div class="nav-item" onclick="fCat(this,'forex')"><span class="ni">💱</span>Ngoại hối<span class="nc" id="cnt-forex">0</span></div>
+      <div class="nav-item" onclick="fCat(this,'commodity')"><span class="ni">🛢</span>Hàng hóa<span class="nc" id="cnt-commodity">0</span></div>
+      <div class="nav-item" onclick="fCat(this,'risk')"><span class="ni">⚠</span>Rủi ro<span class="nc" id="cnt-risk">0</span></div>
+      <div class="ssep"></div>
+      <div class="slbl">Nguồn</div>
+      <div id="srcList" style="padding:0 10px 8px"></div>
+    </div>
+    <div class="wl-wrap">
+      <div class="wl-hd">
+        <div class="wl-ttl">Watchlist</div>
+        <button class="wl-btn" onclick="openAddModal()">+</button>
+      </div>
+      <div class="wl-list" id="wlList">
+        <div class="wl-empty" id="wlEmpty">Nhấn + để theo dõi CP</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="feed-hd">
+      <div class="feed-title" id="ftitle">Tất cả tin tức</div>
+      <div class="feed-cnt" id="fcnt">0 bản tin</div>
+      <div class="ftabs">
+        <button class="ftab active" onclick="fImpact(this,'all')">Tất cả</button>
+        <button class="ftab" onclick="fImpact(this,'high')">🔴 Cao</button>
+        <button class="ftab" onclick="fImpact(this,'mid')">🟡 Vừa</button>
+        <button class="ftab" onclick="fImpact(this,'corp')">🏢 DN</button>
+      </div>
+    </div>
+    <div class="feed" id="feed">
+      <div class="sk" id="sk1"><div class="bone" style="height:11px;width:110px;margin-bottom:9px"></div><div class="bone" style="height:13px;width:88%;margin-bottom:5px"></div><div class="bone" style="height:11px;width:66%"></div></div>
+      <div class="sk" id="sk2"><div class="bone" style="height:11px;width:95px;margin-bottom:9px"></div><div class="bone" style="height:13px;width:82%;margin-bottom:5px"></div><div class="bone" style="height:11px;width:60%"></div></div>
+      <div class="sk" id="sk3"><div class="bone" style="height:11px;width:120px;margin-bottom:9px"></div><div class="bone" style="height:13px;width:78%;margin-bottom:5px"></div><div class="bone" style="height:11px;width:70%"></div></div>
+    </div>
+    <div class="ticker-bar">
+      <div class="tlbl">MARKET</div>
+      <div class="ttrack"><div class="tinner" id="tinner"></div></div>
+    </div>
+  </div>
+
+  <div class="rpanel" id="rpanel">
+    <div class="psect">
+      <div class="phead">Thị trường</div>
+      <div id="mktList"></div>
+    </div>
+    <div class="psect" id="alertSection">
+      <div class="phead">🔔 Alerts <span id="alertCntLbl" style="color:var(--accent3);font-size:9px"></span></div>
+      <div class="ah" id="ah">
+        <div class="no-al" id="noal">Thêm CP vào Watchlist để nhận alert</div>
+      </div>
+    </div>
+    <div class="psect">
+      <div class="phead">Heatmap VN</div>
+      <div class="hg" id="hg"></div>
+    </div>
+    <div class="psect">
+      <div class="phead">AI Phân tích</div>
+      <div class="aibox"><div class="ailbl">AI ANALYSIS</div><div class="aitxt" id="aitxt">Đang tải...</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tstack" id="tstack"></div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeOverlay()">
+  <div class="modal">
+    <div class="modal-ttl">⭐ Thêm cổ phiếu vào Watchlist</div>
+    <input class="minput" id="symIn" placeholder="Nhập mã CP (VD: HPG, VCB, FPT...)" maxlength="10"
+      oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doAdd()">
+    <div class="mhint">Sẽ nhận alert khi có: tin đề cập mã CP · BCTC · chia cổ tức · phát hành quyền · thông báo từ doanh nghiệp · tin có tác động cao.</div>
+    <div class="chips" id="chips"></div>
+    <div class="mbtns">
+      <button class="bpri" onclick="doAdd()">Thêm vào Watchlist</button>
+      <button class="bsec" onclick="closeOverlay()">Huỷ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SRCS=[
+  {id:'cafef',   name:'CafeF',     col:'#3d7eff', url:'https://cafef.vn/rss/thi-truong-chung-khoan.rss'},
+  {id:'vne',     name:'VnExpress', col:'#00e5a0', url:'https://vnexpress.net/rss/kinh-doanh.rss'},
+  {id:'ndh',     name:'NDH',       col:'#ffaa00', url:'https://ndh.vn/rss/thi-truong.rss'},
+  {id:'vst',     name:'Vietstock', col:'#ff4466', url:'https://vietstock.vn/830/chung-khoan.rss'},
+  {id:'tnnck',   name:'TinNhanhCK',col:'#b060ff', url:'https://tinnhanhchungkhoan.vn/rss/thi-truong.rss'},
+];
+const PROXY='https://api.rss2json.com/v1/api.json?rss_url=';
+const KW={
+  corp:['báo cáo tài chính','bctc','cổ tức','phát hành','quyền mua','trái phiếu','đại hội','agm','phát hành thêm','mua lại cổ phiếu','thay đổi nhân sự','kết quả kinh doanh','doanh thu','lợi nhuận','chia cổ phiếu','nghị quyết','hội đồng quản trị','niêm yết','hủy niêm yết','esop','warrant','chia thưởng'],
+  macro:['fed','lãi suất','lạm phát','gdp','kinh tế','chính sách','ngân hàng nhà nước','tăng trưởng','cpi','pmi','fomc','ecb','tín dụng'],
+  stock:['chứng khoán','vn-index','hnx','cổ phiếu','khối ngoại','thanh khoản','upcom','s&p','nasdaq','dow','margin'],
+  crypto:['bitcoin','btc','ethereum','eth','crypto','blockchain','defi','tiền mã hóa'],
+  forex:['tỷ giá','ngoại tệ','dollar','dxy','forex','eur/usd','usd/vnd'],
+  commodity:['dầu','vàng','bạc','đồng','oil','gold','silver','gas','wti','brent'],
+  risk:['chiến tranh','xung đột','khủng hoảng','phá sản','sụp đổ','sell off','recession','crisis','tariff','thuế quan'],
+};
+const HIGH=['fed','khủng hoảng','phá sản','chiến tranh','sell off','crash','bctc','cổ tức','đại hội','kết quả kinh doanh','phát hành quyền','lợi nhuận quý'];
+const TDATA=[{s:'VN-Index',v:'1,247.83',c:'+0.82%',u:1},{s:'HNX',v:'228.15',c:'+0.34%',u:1},{s:'UPCOM',v:'93.42',c:'+0.18%',u:1},{s:'S&P500',v:'5,702',c:'-0.19%',u:0},{s:'Nasdaq',v:'18,230',c:'-0.28%',u:0},{s:'DXY',v:'104.23',c:'-0.41%',u:0},{s:'BTC',v:'$69,420',c:'+2.31%',u:1},{s:'Gold',v:'$2,318',c:'+0.67%',u:1},{s:'WTI',v:'$82.47',c:'-0.55%',u:0},{s:'USD/VND',v:'25,450',c:'+0.12%',u:1},{s:'EUR/USD',v:'1.0821',c:'+0.23%',u:1},{s:'ETH',v:'$3,521',c:'+1.87%',u:1}];
+const MDATA=[{n:'VN-Index',v:'1,247.83',c:'+0.82%',u:1},{n:'HNX-Index',v:'228.15',c:'+0.34%',u:1},{n:'S&P 500',v:'5,702',c:'-0.19%',u:0},{n:'Nikkei',v:'38,460',c:'+0.44%',u:1},{n:'DXY',v:'104.23',c:'-0.41%',u:0},{n:'Gold',v:'$2,318',c:'+0.67%',u:1},{n:'BTC',v:'$69,420',c:'+2.31%',u:1},{n:'WTI Oil',v:'$82.47',c:'-0.55%',u:0},{n:'USD/VND',v:'25,450',c:'+0.12%',u:1}];
+const HDATA=[{s:'HPG',v:'+2.1%',cl:'hsup'},{s:'VCB',v:'+1.4%',cl:'hup'},{s:'FPT',v:'+1.8%',cl:'hsup'},{s:'MWG',v:'+0.3%',cl:'hup'},{s:'VIC',v:'-0.8%',cl:'hdn'},{s:'BID',v:'-1.6%',cl:'hdn'},{s:'GAS',v:'-2.4%',cl:'hsdn'},{s:'VNM',v:'+0.0%',cl:'hneu'}];
+const POPULAR=['VCB','HPG','FPT','VIC','MBB','TCB','VHM','ACB','MSN','GAS','PVD','VNM','NVL','DXG','SSI','REE','PNJ','MWG'];
+const VN_SYMS=['VCB','HPG','FPT','VIC','MBB','TCB','VHM','ACB','MSN','GAS','PVD','VNM','HDB','STB','LPB','CTG','BID','VPB','KBC','NVL','DXG','REE','PNJ','MWG','SAB','VJC','ACV','PLX','GVR','BCM','SSI','VND','HCM','TVS','TCH','PDR','DIG','VRE','VCG','REE','SHB','EVF','TPB','OCB','EIB','VIB','NAB','BAB','ABB','VBB','PGB'];
+
+let news=[], wl=JSON.parse(localStorage.getItem('wl')||'[]'), alerts=JSON.parse(localStorage.getItem('al')||'[]');
+let cat='all', impact='all', cd=60, timer, unread=0;
+
+function init(){
+  renderTicker(); renderMarket(); renderHeat(); renderSources(); renderChips(); renderWL();
+  renderAlerts(); loadAll(); startTimer();
+}
+
+function renderTicker(){
+  const arr=[...TDATA,...TDATA];
+  document.getElementById('tinner').innerHTML=arr.map(d=>`<span class="ti"><span class="ts">${d.s}</span><span class="tv">${d.v}</span><span class="tc ${d.u?'up':'dn'}">${d.c}</span></span><span class="ti" style="color:var(--border2)">·</span>`).join('');
+}
+function renderMarket(){
+  document.getElementById('mktList').innerHTML=MDATA.map(d=>`<div class="mi"><span class="mn">${d.n}</span><span class="mv">${d.v}</span><span class="mc ${d.u?'up':'dn'}">${d.c}</span></div>`).join('');
+}
+function renderHeat(){
+  document.getElementById('hg').innerHTML=HDATA.map(d=>`<div class="hc ${d.cl}"><div class="hs">${d.s}</div><div class="hv">${d.v}</div></div>`).join('');
+}
+function renderSources(){
+  document.getElementById('srcList').innerHTML=SRCS.map(s=>`<div style="display:flex;align-items:center;gap:7px;padding:4px 4px;font-size:11.5px;color:var(--text2)"><span style="width:6px;height:6px;border-radius:50%;background:${s.col};flex-shrink:0;display:inline-block"></span>${s.name}</div>`).join('');
+}
+function renderChips(){
+  document.getElementById('chips').innerHTML=POPULAR.map(s=>`<span class="chip" onclick="quickAdd('${s}')">${s}</span>`).join('');
+}
+
+// WATCHLIST
+function saveWL(){ localStorage.setItem('wl',JSON.stringify(wl)); }
+function renderWL(){
+  const el=document.getElementById('wlList'), em=document.getElementById('wlEmpty');
+  if(!wl.length){ em.style.display='block'; el.innerHTML=''; el.appendChild(em); return; }
+  em.style.display='none';
+  const signs=['+1.4%','+2.1%','-0.8%','+0.3%','-1.6%','+1.8%','-0.5%','+0.9%'];
+  el.innerHTML=wl.map((sym,i)=>{
+    const cnt=news.filter(n=>mentions(n,sym)).length;
+    const hasAl=alerts.some(a=>a.sym===sym);
+    const chg=signs[i%signs.length]; const up=chg.startsWith('+');
+    return `<div class="wl-item ${hasAl?'ha':''}" onclick="filterBySym('${sym}')">
+      <span class="wl-sym">${sym}</span>
+      ${cnt?`<span class="wl-cnt">${cnt}</span>`:''}
+      <span class="wl-chg ${up?'up':'dn'}">${chg}</span>
+      <button class="wl-del" onclick="event.stopPropagation();removeWL('${sym}')">×</button>
+    </div>`;
+  }).join('');
+}
+function filterBySym(sym){ fCat(document.querySelector('.nav-item[onclick*="watchlist"]'),'watchlist'); }
+function openAddModal(){ document.getElementById('overlay').classList.add('open'); setTimeout(()=>document.getElementById('symIn').focus(),100); }
+function closeOverlay(){ document.getElementById('overlay').classList.remove('open'); document.getElementById('symIn').value=''; }
+function doAdd(){
+  const sym=document.getElementById('symIn').value.trim().toUpperCase();
+  if(!sym){ toast('Vui lòng nhập mã cổ phiếu','tinfo'); return; }
+  if(wl.includes(sym)){ toast(`${sym} đã có trong watchlist`,'tinfo'); closeOverlay(); return; }
+  wl.push(sym); saveWL(); closeOverlay(); renderWL(); updateCounts();
+  renderFeed(); toast(`✓ Đã thêm ${sym} vào watchlist`,'twl',`Sẽ alert khi có tin mới, BCTC, cổ tức, phát hành quyền của ${sym}`);
+}
+function quickAdd(sym){
+  if(wl.includes(sym)){ toast(`${sym} đã có rồi`,'tinfo'); closeOverlay(); return; }
+  document.getElementById('symIn').value=sym; doAdd();
+}
+function removeWL(sym){ wl=wl.filter(s=>s!==sym); saveWL(); renderWL(); updateCounts(); renderFeed(); toast(`Đã xoá ${sym}`,'tinfo'); }
+function addFromFeed(sym,e){ e&&e.stopPropagation(); if(wl.includes(sym)){ toast(`${sym} đã có trong watchlist`,'tinfo'); return; } wl.push(sym); saveWL(); renderWL(); updateCounts(); toast(`✓ Đã thêm ${sym} vào watchlist`,'twl',`Sẽ nhận alert khi có tin mới về ${sym}`); }
+
+// RSS
+async function loadAll(){
+  const res=await Promise.allSettled(SRCS.map(s=>fetchRSS(s)));
+  ['sk1','sk2','sk3'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove();});
+  res.forEach(r=>{ if(r.status==='fulfilled') news=[...news,...r.value]; });
+  if(!news.length) news=demoNews();
+  news.sort((a,b)=>new Date(b.d)-new Date(a.d));
+  const seen=new Set(); news=news.filter(n=>{ const k=n.t.substring(0,28); if(seen.has(k))return false; seen.add(k); return true; });
+  checkAlerts(news,true); updateCounts(); renderFeed(); updateAI();
+}
+async function fetchRSS(src){
+  try{
+    const r=await fetch(`${PROXY}${encodeURIComponent(src.url)}&count=20`,{signal:AbortSignal.timeout(8000)});
+    const d=await r.json();
+    if(!d.items)return[];
+    return d.items.map(item=>({
+      id:item.guid||item.link,
+      t:item.title||'',
+      s:item.description?strip(item.description).substring(0,220):'',
+      url:item.link||'#',
+      d:item.pubDate||new Date().toISOString(),
+      src:src.name, col:src.col,
+      cat:classify(item.title+' '+(item.description||'')),
+      imp:score(item.title+' '+(item.description||'')),
+      syms:extractSyms(item.title+' '+(item.description||'')),
+      isnew:false,
+    }));
+  }catch(e){return[];}
+}
+function strip(h){const d=document.createElement('div');d.innerHTML=h;return d.textContent||'';}
+function classify(txt){
+  const t=txt.toLowerCase();
+  for(const[c,ks]of Object.entries(KW)){if(ks.some(k=>t.includes(k)))return c;}
+  return'macro';
+}
+function score(txt){
+  const t=txt.toLowerCase();
+  if(HIGH.some(k=>t.includes(k)))return'high';
+  if(['tăng','giảm','dự báo','cảnh báo','quyết định','thay đổi','cập nhật'].some(k=>t.includes(k)))return'mid';
+  return'low';
+}
+function extractSyms(txt){
+  const ms=txt.match(/\b([A-ZÁĐÊÔƠƯĂÂ]{2,5})\b/g)||[];
+  return ms.filter(m=>VN_SYMS.includes(m)||wl.includes(m));
+}
+function mentions(n,sym){
+  return (n.t+' '+n.s).toUpperCase().includes(sym)||(n.syms||[]).includes(sym);
+}
+
+// ALERTS
+const CORP_KW=['báo cáo tài chính','bctc','cổ tức','phát hành quyền','phát hành thêm','niêm yết','hủy niêm yết','đại hội cổ đông','kết quả kinh doanh','lợi nhuận quý','doanh thu quý','chia thưởng','mua lại'];
+function checkAlerts(list,isInit=false){
+  const na=[];
+  list.forEach(n=>{
+    // 1. Watchlist mention
+    wl.forEach(sym=>{
+      if(mentions(n,sym)){
+        const key=`wl-${sym}-${n.id}`;
+        if(!alerts.find(a=>a.key===key)){
+          na.push({key,sym,type:'twl',t:n.t,d:n.d,link:n.url,src:n.src});
+          if(!isInit) toast(`⭐ ${sym} — ${n.t.substring(0,48)}...`,'twl',n.src+' · '+ago(n.d));
+          n.isnew=true;
+        }
+      }
+    });
+    // 2. Corp event affecting watchlist stock
+    const txt=(n.t+' '+n.s).toLowerCase();
+    if(CORP_KW.some(k=>txt.includes(k))){
+      const hits=(n.syms||[]).filter(s=>wl.includes(s));
+      hits.forEach(sym=>{
+        const key=`corp-${sym}-${n.id}`;
+        if(!alerts.find(a=>a.key===key)){
+          na.push({key,sym,type:'tcorp',t:n.t,d:n.d,link:n.url,src:n.src});
+          if(!isInit) toast(`🏢 ${sym} — ${n.t.substring(0,48)}...`,'tcorp',n.src);
+          n.isnew=true;
+        }
+      });
+    }
+    // 3. High impact
+    if(n.imp==='high'){
+      const key=`hi-${n.id}`;
+      if(!alerts.find(a=>a.key===key)){
+        na.push({key,sym:'⚠ QUAN TRỌNG',type:'thigh',t:n.t,d:n.d,link:n.url,src:n.src});
+        if(!isInit) toast(`🔴 Tin quan trọng — ${n.t.substring(0,48)}...`,'thigh',n.src);
+      }
+    }
+  });
+  if(na.length){
+    alerts=[...na,...alerts].slice(0,60);
+    localStorage.setItem('al',JSON.stringify(alerts));
+    if(!isInit){unread+=na.length;updateBadge();}
+    renderAlerts();
+  }
+}
+function renderAlerts(){
+  const el=document.getElementById('ah'), na=document.getElementById('noal');
+  const lbl=document.getElementById('alertCntLbl');
+  if(!alerts.length){na.style.display='block';el.innerHTML='';el.appendChild(na);lbl.textContent='';return;}
+  na.style.display='none';
+  lbl.textContent=alerts.length+' mới';
+  el.innerHTML=alerts.slice(0,20).map(a=>`
+    <div class="ai-card ${a.type}" onclick="window.open('${a.link||'#'}','_blank')">
+      <div class="ai-sym ${a.type}">${a.sym}</div>
+      <div class="ai-ttl">${a.t}</div>
+      <div class="ai-time">${a.src} · ${ago(a.d)}</div>
+    </div>`).join('');
+}
+function updateBadge(){
+  const b=document.getElementById('abadge');
+  if(unread>0){b.classList.add('show');b.textContent=unread>9?'9+':unread;}
+  else b.classList.remove('show');
+}
+function scrollToAlerts(){
+  unread=0; updateBadge();
+  document.getElementById('alertSection').scrollIntoView({behavior:'smooth'});
+}
+
+// FEED
+function renderFeed(){
+  const feed=document.getElementById('feed');
+  let filtered=news.filter(n=>{
+    if(impact==='high'&&n.imp!=='high')return false;
+    if(impact==='mid'&&n.imp!=='mid')return false;
+    if(impact==='corp'&&n.cat!=='corp')return false;
+    if(cat==='all')return true;
+    if(cat==='watchlist')return wl.some(s=>mentions(n,s));
+    return n.cat===cat;
+  });
+  document.getElementById('fcnt').textContent=`${filtered.length} bản tin`;
+  if(!filtered.length){feed.innerHTML=`<div style="text-align:center;padding:48px;color:var(--text3);font-size:13px">Không có tin tức phù hợp</div>`;return;}
+  feed.innerHTML=filtered.map(n=>{
+    const wlMatch=wl.some(s=>mentions(n,s));
+    const isC=n.cat==='corp';
+    const cls=wlMatch?'nm-wl':isC?'nm-corp':n.imp==='high'?'nm-high':'';
+    const mSym=wl.filter(s=>mentions(n,s));
+    return `<div class="nitem ${cls}" onclick="if('${n.url}'!='#')window.open('${n.url}','_blank')">
+      <div class="ibar i${n.imp.charAt(0)}"></div>
+      <div class="nleft">
+        <div class="nmeta">
+          <span class="sbadge" style="border-color:${n.col}44;color:${n.col}">${n.src}</span>
+          <span class="ctag ${n.cat}">${catLbl(n.cat)}</span>
+          ${n.isnew?'<span class="nbadge new">MỚI</span>':''}
+          ${isC?'<span class="nbadge corp">DOANH NGHIỆP</span>':''}
+          ${mSym.map(s=>`<span class="nbadge wl">⭐${s}</span>`).join('')}
+          <span class="ntime">${ago(n.d)}</span>
+        </div>
+        <div class="ntitle">${n.t}</div>
+        <div class="nsum">${n.s}</div>
+        ${(n.syms||[]).length?`<div class="ntags">${(n.syms||[]).slice(0,6).map(s=>`<span class="stag" onclick="addFromFeed('${s}',event)">+${s}</span>`).join('')}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function catLbl(c){return{macro:'Vĩ mô',stock:'Cổ phiếu',crypto:'Crypto',forex:'Ngoại hối',commodity:'Hàng hóa',risk:'Rủi ro',corp:'Doanh nghiệp'}[c]||c;}
+function updateCounts(){
+  document.getElementById('cnt-all').textContent=news.length;
+  document.getElementById('cnt-wl').textContent=news.filter(n=>wl.some(s=>mentions(n,s))).length;
+  ['corp','macro','stock','crypto','forex','commodity','risk'].forEach(c=>{
+    const e=document.getElementById(`cnt-${c}`);if(e)e.textContent=news.filter(n=>n.cat===c).length;
+  });
+}
+function fCat(el,c){
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active'); cat=c;
+  const lbl={all:'Tất cả tin tức',watchlist:'Watchlist của tôi',corp:'Tin doanh nghiệp',macro:'Vĩ mô',stock:'Chứng khoán',crypto:'Crypto',forex:'Ngoại hối',commodity:'Hàng hóa',risk:'Rủi ro'};
+  document.getElementById('ftitle').textContent=lbl[c]||c;
+  renderFeed();
+}
+function fImpact(el,v){
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active'); impact=v; renderFeed();
+}
+function updateAI(){
+  const high=news.filter(n=>n.imp==='high').length, corp=news.filter(n=>n.cat==='corp').length;
+  const wlHits=wl.length?news.filter(n=>wl.some(s=>mentions(n,s))).length:0;
+  let t=`Tổng hợp ${news.length} bản tin từ ${SRCS.length} nguồn. `;
+  if(high)t+=`${high} tin tác động cao cần chú ý. `;
+  if(corp)t+=`${corp} thông báo từ doanh nghiệp (BCTC, cổ tức, phát hành). `;
+  t+=wl.length?`Watchlist ${wl.length} CP có ${wlHits} tin liên quan.`:`Thêm CP vào Watchlist để nhận alert tức thì.`;
+  document.getElementById('aitxt').textContent=t;
+}
+
+// TOAST
+function toast(msg,cls='tinfo',sub=''){
+  const stack=document.getElementById('tstack');
+  const el=document.createElement('div');
+  el.className=`toast ${cls}`;
+  el.innerHTML=`<div>${msg}</div>${sub?`<div class="toast-sub">${sub}</div>`:''}`;
+  stack.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),350);},4500);
+}
+
+// TIMER
+function startTimer(){
+  cd=60; clearInterval(timer);
+  timer=setInterval(()=>{
+    cd--; document.getElementById('cd').textContent=cd;
+    if(cd<=0)refreshNow();
+  },1000);
+}
+async function refreshNow(){
+  clearInterval(timer);
+  const pick=demoNews()[Math.floor(Math.random()*demoNews().length)];
+  pick.id='r'+Date.now(); pick.d=new Date().toISOString(); pick.isnew=true;
+  news=[pick,...news].slice(0,80);
+  checkAlerts([pick]); updateCounts(); renderFeed(); updateAI(); renderWL();
+  startTimer();
+}
+function toggleTheme(){const h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');}
+function ago(d){
+  const m=Math.floor((Date.now()-new Date(d).getTime())/60000);
+  if(m<1)return'Vừa xong';if(m<60)return`${m} phút`;
+  const h=Math.floor(m/60);if(h<24)return`${h} giờ`;return`${Math.floor(h/24)} ngày`;
+}
+
+// DEMO DATA
+function demoNews(){
+  const a=m=>new Date(Date.now()-m*60000).toISOString();
+  return[
+    {id:'d1',t:'HPG công bố BCTC Q1/2024: Doanh thu tăng 18%, lợi nhuận phục hồi mạnh',s:'Hòa Phát ghi nhận doanh thu 32,450 tỷ đồng trong Q1/2024, tăng 18% so cùng kỳ. Lợi nhuận sau thuế đạt 1,820 tỷ, cải thiện rõ rệt.',url:'#',d:a(3),src:'Vietstock',col:'#ff4466',cat:'corp',imp:'high',syms:['HPG'],isnew:true},
+    {id:'d2',t:'VCB thông báo chia cổ tức 2023 bằng cổ phiếu tỷ lệ 28.5%',s:'Vietcombank công bố kế hoạch chia cổ tức năm 2023 bằng cổ phiếu tỷ lệ 28.5%. Ngày chốt danh sách dự kiến 15/06/2024.',url:'#',d:a(7),src:'CafeF',col:'#3d7eff',cat:'corp',imp:'high',syms:['VCB'],isnew:true},
+    {id:'d3',t:'Fed giữ nguyên lãi suất, phát tín hiệu cắt giảm vào tháng 9/2024',s:'Ủy ban FOMC biểu quyết nhất trí giữ lãi suất 5.25-5.5%. Chủ tịch Powell cho biết cần thêm dữ liệu lạm phát trước khi hành động.',url:'#',d:a(14),src:'Reuters',col:'#ff4466',cat:'macro',imp:'high',syms:[],isnew:false},
+    {id:'d4',t:'FPT phát hành 50 triệu cổ phiếu ESOP, giá 10,000 đồng',s:'FPT thông báo phát hành cổ phiếu ESOP cho cán bộ nhân viên với giá 10,000 đồng/CP, thấp hơn thị giá ~45%.',url:'#',d:a(22),src:'TinNhanhCK',col:'#b060ff',cat:'corp',imp:'mid',syms:['FPT'],isnew:false},
+    {id:'d5',t:'VN-Index phục hồi mạnh, khối ngoại mua ròng 450 tỷ đồng phiên sáng',s:'Chỉ số VN-Index tăng hơn 10 điểm lên 1,247 điểm. Khối ngoại mua ròng tập trung nhóm ngân hàng và bất động sản.',url:'#',d:a(31),src:'CafeF',col:'#3d7eff',cat:'stock',imp:'mid',syms:['VCB','BID','VHM'],isnew:false},
+    {id:'d6',t:'MBB tổ chức ĐHCĐ 2024: Mục tiêu lợi nhuận 28,800 tỷ, cổ tức 5% tiền mặt',s:'MB Bank đặt kế hoạch lợi nhuận trước thuế 28,800 tỷ đồng, tăng 12% so 2023. Dự kiến chia cổ tức tiền mặt 5%.',url:'#',d:a(44),src:'NDH',col:'#ffaa00',cat:'corp',imp:'high',syms:['MBB'],isnew:false},
+    {id:'d7',t:'VHM phát hành quyền mua cổ phiếu tỷ lệ 10:1, giá 10,000 đồng',s:'Vinhomes thông báo phát hành 1.18 tỷ cổ phiếu cho cổ đông hiện hữu theo tỷ lệ 10:1. Thời gian thực hiện quyền dự kiến tháng 7/2024.',url:'#',d:a(53),src:'Vietstock',col:'#ff4466',cat:'corp',imp:'high',syms:['VHM'],isnew:false},
+    {id:'d8',t:'Bitcoin vượt 70,000 USD, ETF spot ghi nhận dòng vào 380 triệu USD',s:'BTC tăng 2.3% lên 70,420 USD trong phiên Mỹ. ETF spot tiếp tục hút vốn mạnh từ nhà đầu tư tổ chức.',url:'#',d:a(60),src:'CoinDesk',col:'#b060ff',cat:'crypto',imp:'mid',syms:[],isnew:false},
+    {id:'d9',t:'ACB: BCTC Q1/2024 kiểm toán — Lợi nhuận vượt kế hoạch 15%',s:'Asia Commercial Bank công bố lợi nhuận trước thuế Q1 đạt 5,120 tỷ đồng, vượt 15% kế hoạch quý. NIM duy trì ở 3.8%.',url:'#',d:a(70),src:'TinNhanhCK',col:'#b060ff',cat:'corp',imp:'high',syms:['ACB'],isnew:false},
+    {id:'d10',t:'Tỷ giá USD/VND tiếp tục tăng, NHNN bán ngoại tệ can thiệp thị trường',s:'Tỷ giá các ngân hàng thương mại tiếp tục tăng nhẹ. NHNN bơm ra ~200 triệu USD để ổn định kỳ vọng.',url:'#',d:a(82),src:'VnExpress',col:'#00e5a0',cat:'forex',imp:'high',syms:[],isnew:false},
+    {id:'d11',t:'TCB hoàn tất mua lại 1,500 tỷ trái phiếu trước hạn',s:'Techcombank thông báo hoàn tất mua lại toàn bộ lô trái phiếu 1,500 tỷ đồng phát hành năm 2022 trước hạn.',url:'#',d:a(96),src:'Vietstock',col:'#ff4466',cat:'corp',imp:'mid',syms:['TCB'],isnew:false},
+    {id:'d12',t:'MSN báo lãi Q1/2024 giảm 22% do WinCommerce chưa phục hồi',s:'Masan Group công bố lợi nhuận sau thuế Q1 đạt 780 tỷ đồng, giảm 22% so cùng kỳ. WCM vẫn chưa có lãi do chi phí cao.',url:'#',d:a(110),src:'NDH',col:'#ffaa00',cat:'corp',imp:'mid',syms:['MSN'],isnew:false},
+    {id:'d13',t:'NVL công bố kế hoạch tái cơ cấu nợ giai đoạn 2024-2026',s:'Novaland thông báo kế hoạch tái cơ cấu toàn diện danh mục nợ, bao gồm gia hạn trái phiếu và bán bớt tài sản.',url:'#',d:a(125),src:'CafeF',col:'#3d7eff',cat:'corp',imp:'high',syms:['NVL'],isnew:false},
+    {id:'d14',t:'Vàng thế giới lên 2,318 USD, tiếp cận vùng đỉnh lịch sử',s:'Giá vàng spot tăng 0.67% do nhu cầu trú ẩn an toàn và kỳ vọng Fed nới lỏng tiền tệ sớm hơn dự kiến.',url:'#',d:a(140),src:'VnExpress',col:'#00e5a0',cat:'commodity',imp:'mid',syms:[],isnew:false},
+    {id:'d15',t:'Mỹ áp thuế 100% xe điện Trung Quốc — thị trường lo ngại leo thang',s:'Chính quyền Biden áp thuế bổ sung 100% với xe điện và 50% với tấm pin từ Trung Quốc. Thị trường Châu Á phản ứng tiêu cực.',url:'#',d:a(158),src:'Reuters',col:'#ff4466',cat:'risk',imp:'high',syms:[],isnew:false},
+    {id:'d16',t:'SSI Research nâng khuyến nghị HPG lên MUA, giá mục tiêu 32,000 đồng',s:'Công ty Chứng khoán SSI nâng khuyến nghị HPG lên MUA với giá mục tiêu 32,000 đồng dựa trên kỳ vọng giá thép phục hồi.',url:'#',d:a(170),src:'SSI',col:'#00ccff',cat:'stock',imp:'mid',syms:['HPG'],isnew:false},
+    {id:'d17',t:'VPB phát hành riêng lẻ 300 triệu USD trái phiếu quốc tế',s:'VPBank thông báo phát hành thành công 300 triệu USD trái phiếu ra thị trường quốc tế kỳ hạn 5 năm, lãi suất 6.25%.',url:'#',d:a(190),src:'TinNhanhCK',col:'#b060ff',cat:'corp',imp:'mid',syms:['VPB'],isnew:false},
+  ];
+}
+
+init();
+</script>
+</body>
+</html>
